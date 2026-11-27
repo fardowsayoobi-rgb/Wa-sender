@@ -1,6 +1,2 @@
-[build]
-  publish = "."
-  functions = "netlify/functions"
-
-[functions]
-  node_bundler = "esbuild"
+# This app is not designed to run as Netlify Functions.
+# Deploy on an always-on Node.js host with persistent storage instead.

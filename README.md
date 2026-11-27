@@ -1,34 +1,23 @@
-# WhatsApp Sender — Netlify + Official WhatsApp Cloud API
+# WhatsApp Customer Desk — Unofficial
 
-A small Persian RTL dashboard for sending approved WhatsApp template messages to contacts who have explicitly opted in.
+A small opt-in customer messaging dashboard using a WhatsApp Web session through Baileys. This is **not** the official WhatsApp Business API and is not affiliated with Meta.
 
-## Features
-- CSV import (`phone,name,consent`)
-- Manual contact entry with an explicit consent checkbox
-- Approved template message sending through Meta WhatsApp Cloud API
-- Server-side credentials (never expose the access token in browser code)
-- Basic pacing, stop control, and per-recipient result log
+## Important risks
+- Unofficial automation may violate WhatsApp's terms and can lead to temporary or permanent account restrictions.
+- Use only with people who explicitly agreed to receive messages. Honor opt-outs immediately. Do not use for unsolicited bulk messaging.
+- Use a separate business number, not your personal WhatsApp number. Never share the QR code or `auth_info` folder.
+- This starter has a small per-batch cap and an 8-second interval, but these measures do not guarantee account safety.
 
-## Deploy
-1. Create a Netlify site and deploy this folder (or connect its GitHub repository).
-2. In Netlify Site configuration → Environment variables, add:
-   - `WHATSAPP_TOKEN` — permanent/system-user access token from Meta
-   - `WHATSAPP_PHONE_NUMBER_ID` — WhatsApp Business phone number ID
-   - `WHATSAPP_API_VERSION` — optional, e.g. `v23.0`; use a version currently supported by Meta.
-3. Redeploy after adding environment variables.
-4. Create and get approval for a message template in WhatsApp Manager. Enter its exact name and language code in the dashboard.
+## Run on Windows / Linux
+1. Install Node.js 20 or newer.
+2. Copy `.env.example` to `.env` and set a strong `DASHBOARD_PASSWORD`.
+3. In this folder run `npm install` then `npm start`.
+4. Open `http://localhost:3000` and enter the dashboard password.
+5. In WhatsApp on the phone: Settings / Linked devices / Link a device; scan the QR shown in the dashboard.
+6. Import CSV with columns `phone,name,consent`. Use international numbers without spaces, e.g. `937XXXXXXXX`; `consent` must be `yes` or `true`.
 
-## CSV format
-```csv
-phone,name,consent
-93700111222,Ahmad,true
-989121234567,Sara,yes
-```
-Phone numbers must be international digits only (country code, no plus sign). Only rows with `consent=true/yes/1` are imported.
+## Hosting
+This requires a persistent Node.js process and persistent storage for `auth_info`. Netlify Functions are not suitable for maintaining this WhatsApp Web session. Use a VPS or an always-on computer. Do not deploy publicly without HTTPS, a strong password, firewall restrictions, and persistent storage.
 
-## Important compliance notes
-- Use only with people who explicitly agreed to receive WhatsApp messages from your business.
-- Honor opt-outs immediately; this starter dashboard does not yet include a persistent suppression database or webhook-based STOP processing.
-- Outside the customer-service window, use approved templates. Follow Meta's current messaging, quality, rate, and regional rules.
-- Do not use this project for unsolicited bulk messaging, scraping numbers, or bypassing WhatsApp limits.
-- This is an MVP starter, not a production CRM. Add authentication, a database-backed consent ledger, webhook verification, audit logs, and robust queue/retry handling before real customer campaigns.
+## Limitations
+This is a starter, not a production CRM. It has no user accounts, encrypted database, opt-out management UI, delivery receipts, or webhook support. Add these before business-critical use. The QR/session can expire and require relinking.

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b3d2e">
+<title>WhatsApp Sender</title>
+<style>
+:root{--bg:#f2f5f3;--card:#fff;--tx:#14201a;--mut:#667570;--ac:#0f8a4f;--bd:#e0e7e3;--rd:#c0392b;--sh:0 1px 3px rgba(10,40,25,.08);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1311;--card:#18201c;--tx:#ecf2ee;--mut:#93a39b;--ac:#2fb56a;--bd:#27322c;--rd:#e5675a;--sh:none}}
+:root[data-theme="dark"]{--bg:#0e1311;--card:#18201c;--tx:#ecf2ee;--mut:#93a39b;--ac:#2fb56a;--bd:#27322c;--rd:#e5675a;--sh:none}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Tahoma,sans-serif;-webkit-tap-highlight-color:transparent}
+header{background:linear-gradient(135deg,#0b3d2e,#0f8a4f);color:#fff;padding:22px 16px 26px;border-radius:0 0 22px 22px}
+header h1{margin:0 0 4px;font-size:20px}
+header p{margin:0;font-size:13px;opacity:.85}
+main{max-width:600px;margin:0 auto;padding:14px 14px 110px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:14px;box-shadow:var(--sh)}
+.card h2{margin:0 0 10px;font-size:15px;display:flex;justify-content:space-between;align-items:center}
+.card h2 small{color:var(--mut);font-weight:normal;font-size:12px}
+textarea,input[type=text],input[type=tel]{width:100%;padding:11px;border:1px solid var(--bd);border-radius:11px;background:var(--bg);color:var(--tx);font:inherit}
+textarea{min-height:170px;line-height:1.8;resize:vertical}
+button{font:inherit;border:0;border-radius:11px;padding:10px 14px;background:var(--ac);color:#fff;cursor:pointer}
+button.sec{background:transparent;color:var(--ac);border:1px solid var(--ac);padding:8px 12px;font-size:13px}
+button.ic{background:transparent;border:1px solid var(--bd);color:var(--tx);padding:8px 10px}
+button.dl{border-color:var(--rd);color:var(--rd)}
+button.dl.arm{background:var(--rd);color:#fff}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.files{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.file{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:10px;padding:8px 10px;font-size:13px}
+.file span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file img{height:34px;width:34px;object-fit:cover;border-radius:6px}
+.row{display:flex;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--bd)}
+.row:first-child{border-top:0}
+.row.done .n{opacity:.45}
+.row input[type=checkbox]{width:20px;height:20px;accent-color:var(--ac);flex:none}
+.n{flex:1;min-width:0}
+.n b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.n span{color:var(--mut);font-size:12px}
+.edit{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:1}
+.edit button{grid-column:1/3}
+.add{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.add button{grid-column:1/3}
+a.go{background:var(--ac);color:#fff;border-radius:10px;padding:8px 14px;text-decoration:none;font-size:13.5px;flex:none}
+.row.done a.go{background:transparent;color:var(--ac);border:1px solid var(--ac)}
+.sel{display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.note{color:var(--mut);font-size:12px;line-height:1.7;margin:10px 0 0}
+.bottom{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--bd);padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));display:flex;gap:10px;align-items:center}
+.bottom .info{flex:1;font-size:13px;color:var(--mut)}
+.bottom .info b{color:var(--tx);font-size:15px}
+.bottom button{padding:13px 18px;font-size:15px}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:#222;color:#fff;padding:10px 16px;border-radius:12px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90%;z-index:9}
+#toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header><h1>WhatsApp Sender</h1><p>Send a message and files to selected numbers without saving them as contacts</p></header>
+<main>
+
+<section class="card">
+  <h2>1. Message</h2>
+  <textarea id="msg" dir="auto"></textarea>
+</section>
+
+<section class="card">
+  <h2>2. Files <small>photos, PDF, video, any file</small></h2>
+  <input type="file" id="fin" multiple hidden>
+  <div class="tools">
+    <button class="sec" id="pick">📎 Add files</button>
+    <button id="shareF" hidden>Send files via WhatsApp</button>
+  </div>
+  <div class="files" id="files"></div>
+  <p class="note">WhatsApp cannot attach files to a link automatically. Send the text first, then tap “Send files via WhatsApp”, choose WhatsApp and pick the same chat.</p>
+</section>
+
+<section class="card">
+  <h2>3. Numbers <small id="cnt"></small></h2>
+  <div class="sel">
+    <button class="sec" id="all">Select all</button>
+    <button class="sec" id="none">Select none</button>
+    <button class="sec" id="reset">Reset sent</button>
+  </div>
+  <div id="list"></div>
+</section>
+
+<section class="card">
+  <h2>Add a number</h2>
+  <div class="add">
+    <input type="text" id="aname" placeholder="Name / company" dir="auto">
+    <input type="tel" id="anum" placeholder="0700123456">
+    <button id="addBtn">+ Add to list</button>
+  </div>
+  <p class="note">Any format works (0700123456 or +93700123456). Landline numbers don't have WhatsApp. Wait a few seconds between sends to avoid limits on your number.</p>
+</section>
+</main>
+
+<div class="bottom">
+  <div class="info">Sent <b id="sent">0</b> of <b id="selc">0</b> selected</div>
+  <button id="next">▶ Send next</button>
+</div>
+<div id="toast"></div>
+
+<script>
+const DEFAULT_MSG = "سلام و احترام،\nشرکت تجارتی و دوایی بیت نیکه، نماینده انحصاری شیر خشک و غذای کودک دبدوب (DABDUB) ساخت ترکیه در افغانستان، استاک آماده را به صورت عمده عرضه می‌کند.\n\nمحصولات: شیر خشک مرحله ۱، ۲، ۳، نارس، ضد رفلاکس (AR)، بدون لاکتوز (LF)، شیر پرچرب و سریالک.\nدارای اسناد کامل گمرکی، GMP، حلال و COA.\n\nبرای نرخنامه روز، نمونه و قرارداد:\n0788467400 / +93 794 013030\n\nبا احترام، بیت نیکه";
+const $ = id => document.getElementById(id);
+let tt; const toast = t => { const e = $('toast'); e.textContent = t; e.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => e.classList.remove('on'), 2600); };
+const norm = p => {
+  let d = String(p).replace(/[۰-۹]/g, c => "۰۱۲۳۴۵۶۷۸۹".indexOf(c)).replace(/[^0-9]/g, "");
+  if (d.startsWith("00")) d = d.slice(2);
+  if (d.startsWith("0")) d = "93" + d.slice(1);
+  else if (d.length === 9 && d[0] === "7") d = "93" + d;
+  return d;
+};
+let uid = 0;
+const mk = (name, p) => ({ id: ++uid, name, num: norm(p), sel: true });
+const DEFAULT_C = [
+ ["Bakhtar Pharma","0777799595"],["Bakhtar Pharma (2)","0700311338"],
+ ["Zamen Pharma","0700258067"],["Zamen Pharma (2)","0705149282"],
+ ["Salar Yousafzai Pharma","0787372000"],["Al Amin Ltd","0744110505"],
+ ["Afghan Med Lab","0790696382"],["Sehat Pharma","0799402510"],
+ ["Hariwa Medical","0799321840"],["Qadir Herawi","0778001265"],
+ ["Wahedi Medical","0799141210"],["Balkh Bastan Pharma","0700504120"],
+ ["Irfan Sameer Ltd","0798262030"],["Kandahar Pharma","0700304512"],
+ ["Nangarhar Central Distribution","0789524222"],["Sharq Pharma","0777604315"]
+];
+let C = DEFAULT_C.map(([n, p]) => mk(n, p)), done = new Set(), editing = null, files = [], armed = null;
+try { const s = JSON.parse(localStorage.getItem('wa3_contacts')); if (Array.isArray(s) && s.every(x => x.num)) { C = s; uid = Math.max(0, ...C.map(c => c.id || 0)); } } catch (e) {}
+try { done = new Set(JSON.parse(localStorage.getItem('wa3_done') || '[]')); } catch (e) {}
+const msg = $('msg'); msg.value = DEFAULT_MSG;
+try { msg.value = localStorage.getItem('wa3_msg') || DEFAULT_MSG; } catch (e) {}
+const save = () => { try {
+  localStorage.setItem('wa3_contacts', JSON.stringify(C));
+  localStorage.setItem('wa3_done', JSON.stringify([...done]));
+  localStorage.setItem('wa3_msg', msg.value);
+} catch (e) {} };
+const url = n => "https://wa.me/" + n + "?text=" + encodeURIComponent(msg.value);
+
+function render() {
+  save();
+  const l = $('list'); l.innerHTML = "";
+  if (!C.length) l.innerHTML = '<p class="note">The list is empty. Add a number below.</p>';
+  C.forEach(c => {
+    const r = document.createElement('div'); r.className = "row" + (done.has(c.id) ? " done" : "");
+    if (editing === c.id) {
+      r.innerHTML = '<div class="edit"><input type="text" class="en" dir="auto"><input type="tel" class="ep"><button class="sv">Save</button></div>';
+      r.querySelector('.en').value = c.name; r.querySelector('.ep').value = "+" + c.num;
+      r.querySelector('.sv').onclick = () => {
+        const nn = norm(r.querySelector('.ep').value);
+        if (nn.length < 10 || nn.length > 15) { toast("Invalid number"); return; }
+        c.name = r.querySelector('.en').value.trim() || ("+" + nn); c.num = nn; editing = null; render();
+      };
+    } else {
+      const cb = document.createElement('input'); cb.type = "checkbox"; cb.checked = !!c.sel;
+      cb.onchange = () => { c.sel = cb.checked; render(); };
+      const n = document.createElement('div'); n.className = "n"; n.innerHTML = '<b dir="auto"></b><span></span>';
+      n.querySelector('b').textContent = c.name; n.querySelector('span').textContent = "+" + c.num;
+      const a = document.createElement('a'); a.className = "go"; a.target = "_blank"; a.rel = "noopener";
+      a.textContent = done.has(c.id) ? "✓ Again" : "Send"; a.href = url(c.num);
+      a.onclick = () => { done.add(c.id); setTimeout(render, 300); };
+      const e = document.createElement('button'); e.className = "ic"; e.textContent = "✎"; e.title = "Edit"; e.onclick = () => { editing = c.id; render(); };
+      const d = document.createElement('button'); d.className = "ic dl" + (armed === c.id ? " arm" : "");
+      d.textContent = armed === c.id ? "Delete?" : "🗑";
+      d.onclick = () => {
+        if (armed === c.id) { C = C.filter(x => x.id !== c.id); done.delete(c.id); armed = null; render(); toast("Deleted"); }
+        else { armed = c.id; render(); setTimeout(() => { if (armed === c.id) { armed = null; render(); } }, 3000); }
+      };
+      r.append(cb, n, a, e, d);
+    }
+    l.appendChild(r);
+  });
+  const sel = C.filter(c => c.sel);
+  $('cnt').textContent = C.length + " numbers";
+  $('selc').textContent = sel.length;
+  $('sent').textContent = sel.filter(c => done.has(c.id)).length;
+}
+
+$('next').onclick = () => {
+  const c = C.find(c => c.sel && !done.has(c.id));
+  if (!c) { toast("All selected numbers are done"); return; }
+  done.add(c.id); window.open(url(c.num), "_blank"); render();
+};
+$('all').onclick = () => { C.forEach(c => c.sel = true); render(); };
+$('none').onclick = () => { C.forEach(c => c.sel = false); render(); };
+$('reset').onclick = () => { done.clear(); render(); toast("Sent marks cleared"); };
+$('addBtn').onclick = () => {
+  const nn = norm($('anum').value);
+  if (nn.length < 10 || nn.length > 15) { toast("Invalid number. Example: 0700123456"); return; }
+  if (C.some(c => c.num === nn)) { toast("This number is already in the list"); return; }
+  C.push({ id: ++uid, name: $('aname').value.trim() || ("+" + nn), num: nn, sel: true });
+  $('aname').value = ""; $('anum').value = ""; render(); toast("Added");
+};
+msg.addEventListener('input', save);
+
+function renderFiles() {
+  const f = $('files'); f.innerHTML = "";
+  files.forEach((file, i) => {
+    const d = document.createElement('div'); d.className = "file";
+    if (file.type.startsWith("image/")) { const im = document.createElement('img'); im.src = URL.createObjectURL(file); d.appendChild(im); } else d.append("📄");
+    const s = document.createElement('span'); s.textContent = file.name; d.appendChild(s);
+    const x = document.createElement('button'); x.className = "ic dl"; x.textContent = "✕"; x.onclick = () => { files.splice(i, 1); renderFiles(); };
+    d.appendChild(x); f.appendChild(d);
+  });
+  $('shareF').hidden = !files.length;
+}
+$('pick').onclick = () => $('fin').click();
+$('fin').onchange = () => { files.push(...$('fin').files); $('fin').value = ""; renderFiles(); };
+$('shareF').onclick = async () => {
+  try {
+    if (navigator.canShare && navigator.canShare({ files })) await navigator.share({ files });
+    else toast("Sharing files isn't supported here. Attach with 📎 inside the WhatsApp chat.");
+  } catch (e) {}
+};
+render();
+</script>
+</body>
+</html>
